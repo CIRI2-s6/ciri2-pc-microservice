@@ -28,5 +28,5 @@ jobs:
         context: .
         push: true
         tags: |
-          jordywalraven/ciri2:latest
-          jordywalraven/ciri2:${{ github.sha }}
+          jordywalraven/ciri2-pc-microservice:latest
+          jordywalraven/ciri2-pc-microservice:${{ github.sha }}
