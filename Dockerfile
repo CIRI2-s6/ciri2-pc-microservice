@@ -1,4 +1,5 @@
-FROM golang:1.22.1
+# Use a smaller base image for the builder stage
+FROM golang:1.22.1 AS builder
 
 # Set destination for COPY
 WORKDIR /app
@@ -12,14 +13,17 @@ RUN go mod download
 COPY ./api .
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /ciri2-pc-microservice
+RUN CGO_ENABLED=0 GOOS=linux go build -o ciri2-pc-microservice
 
-# Optional:
-# To bind to a TCP port, runtime parameters must be supplied to the docker command.
-# But we can document in the Dockerfile what ports
-# the application is going to listen on by default.
-# https://docs.docker.com/reference/dockerfile/#expose
+# Use a minimal base image for the final image
+FROM scratch
+
+# Copy the built binary from the builder stage
+COPY --from=builder /app/ciri2-pc-microservice /ciri2-pc-microservice
+COPY ./api/.env .
+
+# Expose the port
 EXPOSE 6000
 
-# Run
+# Run the binary
 CMD ["/ciri2-pc-microservice"]
