@@ -9,4 +9,5 @@ import (
 func ComponentRoutes(router *gin.Engine) {
 	router.POST("/component", controllers.BatchCreateComponent())
 	router.GET("/component/:id", controllers.GetComponent())
+	router.GET("/components", controllers.FindPaginatedComponent())
 }

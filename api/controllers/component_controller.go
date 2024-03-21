@@ -67,3 +67,27 @@ func GetComponent() gin.HandlerFunc {
 
 	}
 }
+
+func FindPaginatedComponent() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var pagination models.Pagination
+		if err := c.BindJSON(&pagination); err != nil {
+			c.JSON(http.StatusBadRequest, responses.ComponentResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			return
+		}
+
+		if validationErr := validate.Struct(&pagination); validationErr != nil {
+			c.JSON(http.StatusBadRequest, responses.ComponentResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+			return
+		}
+
+		result, err := services.FindPaginatedComponent(pagination)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, responses.ComponentResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			return
+		}
+
+		c.JSON(http.StatusOK, responses.ComponentResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": result}})
+	}
+}
