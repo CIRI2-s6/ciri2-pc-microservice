@@ -1,24 +1,28 @@
 package controllers
 
 import (
-	"ciri2-pc-microservice/models"
-	"ciri2-pc-microservice/responses"
-	"ciri2-pc-microservice/services"
+	"ciri2-pc-microservice/internal/models"
+	"ciri2-pc-microservice/internal/responses"
+	"ciri2-pc-microservice/internal/services"
+	"ciri2-pc-microservice/internal/utils"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+type ComponentController struct{}
+
+var componentService services.ComponentService
 
 var validate = validator.New()
 
-func BatchCreateComponent() gin.HandlerFunc {
+func (c ComponentController) BatchCreateComponent() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var components []models.Component
 		//validate the request body
-		if err := c.BindJSON(&components); err != nil {
-			c.JSON(http.StatusBadRequest, responses.ComponentResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		if !utils.BindJSONAndValidate(c, &components) {
 			return
 		}
 
@@ -30,18 +34,7 @@ func BatchCreateComponent() gin.HandlerFunc {
 			}
 		}
 
-		var newComponents []interface{}
-		for _, component := range components {
-			newComponent := models.Component{
-				Id:         primitive.NewObjectID(),
-				Name:       component.Name,
-				Type:       component.Type,
-				Properties: component.Properties,
-			}
-			newComponents = append(newComponents, newComponent)
-		}
-
-		result, err := services.BatchCreateComponent(newComponents)
+		result, err := componentService.BatchCreateComponent(components)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ComponentResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
@@ -52,11 +45,11 @@ func BatchCreateComponent() gin.HandlerFunc {
 	}
 }
 
-func GetComponent() gin.HandlerFunc {
+func (c ComponentController) GetComponent() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		result, err := services.GetComponent(id)
+		result, err := componentService.GetComponent(id)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ComponentResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
@@ -68,11 +61,11 @@ func GetComponent() gin.HandlerFunc {
 	}
 }
 
-func FindPaginatedComponent() gin.HandlerFunc {
+func (c ComponentController) FindPaginatedComponent() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var pagination models.Pagination
-		if err := c.BindJSON(&pagination); err != nil {
-			c.JSON(http.StatusBadRequest, responses.ComponentResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+
+		if !utils.BindJSONAndValidate(c, &pagination) {
 			return
 		}
 
@@ -81,7 +74,7 @@ func FindPaginatedComponent() gin.HandlerFunc {
 			return
 		}
 
-		result, err := services.FindPaginatedComponent(pagination)
+		result, err := componentService.FindPaginatedComponent(pagination)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ComponentResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})

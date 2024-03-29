@@ -1,0 +1,14 @@
+package routes
+
+import (
+	"ciri2-pc-microservice/internal/controllers"
+
+	"github.com/gin-gonic/gin"
+)
+
+func ComponentRoutes(componentGroup *gin.Engine) {
+	component := new(controllers.ComponentController)
+	componentGroup.POST("/component", component.BatchCreateComponent())
+	componentGroup.GET("/component/:id", component.GetComponent())
+	componentGroup.GET("/component", component.FindPaginatedComponent())
+}

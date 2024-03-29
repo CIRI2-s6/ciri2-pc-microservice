@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"ciri2-pc-microservice/configs"
-	"ciri2-pc-microservice/models"
+	"ciri2-pc-microservice/internal/models"
 	"context"
 	"time"
 
@@ -12,16 +12,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type ComponentRepository struct{}
+
 var componentCollection *mongo.Collection = configs.GetCollection(configs.DB, "components")
 
-func BatchInsert(components []interface{}) (*mongo.InsertManyResult, error) {
+func (c ComponentRepository) BatchInsert(components []interface{}) (*mongo.InsertManyResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	result, err := componentCollection.InsertMany(ctx, components)
 	return result, err
 }
 
-func FindOne(id string) (interface{}, error) {
+func (c ComponentRepository) FindOne(id string) (interface{}, error) {
 	var component models.Component
 	objectId, _ := primitive.ObjectIDFromHex(id)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -30,7 +32,7 @@ func FindOne(id string) (interface{}, error) {
 	return component, err
 }
 
-func FindPaginated(pagination models.Pagination) ([]models.Component, error) {
+func (c ComponentRepository) FindPaginated(pagination models.Pagination) ([]models.Component, error) {
 	var components []models.Component
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
