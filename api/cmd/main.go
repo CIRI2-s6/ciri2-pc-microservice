@@ -10,7 +10,7 @@ import (
 func main() {
 	router := gin.Default()
 
-	//run database
+	// Run database
 	configs.ConnectDB()
 
 	routes.ComponentRoutes(router)

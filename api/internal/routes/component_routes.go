@@ -9,6 +9,8 @@ import (
 func ComponentRoutes(componentGroup *gin.Engine) {
 	component := new(controllers.ComponentController)
 	componentGroup.POST("/component", component.BatchCreateComponent())
+	componentGroup.POST("/component/check", component.CheckAlreadyExistingComponents())
 	componentGroup.GET("/component/:id", component.GetComponent())
 	componentGroup.GET("/component", component.FindPaginatedComponent())
+
 }

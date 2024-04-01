@@ -5,6 +5,8 @@ import (
 	"ciri2-pc-microservice/internal/responses"
 	"ciri2-pc-microservice/internal/services"
 	"ciri2-pc-microservice/internal/utils"
+	"encoding/json"
+	"strconv"
 
 	"net/http"
 
@@ -25,7 +27,6 @@ func (c ComponentController) BatchCreateComponent() gin.HandlerFunc {
 		if !utils.BindJSONAndValidate(c, &components) {
 			return
 		}
-
 		//use the validator library to validate required fields
 		for _, component := range components {
 			if validationErr := validate.Struct(&component); validationErr != nil {
@@ -65,8 +66,30 @@ func (c ComponentController) FindPaginatedComponent() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var pagination models.Pagination
 
-		if !utils.BindJSONAndValidate(c, &pagination) {
-			return
+		// Get pagination parameters from URL
+		pagination.Skip, _ = strconv.Atoi(c.Query("skip"))
+		pagination.Limit, _ = strconv.Atoi(c.Query("limit"))
+
+		// Parse the sort parameter as JSON if provided
+		sortJSON := c.Query("sort")
+		if sortJSON != "" {
+			var sort map[string]interface{}
+			if err := json.Unmarshal([]byte(sortJSON), &sort); err != nil {
+				c.JSON(http.StatusBadRequest, responses.ComponentResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				return
+			}
+			pagination.Sort = sort
+		}
+
+		// Parse the filter parameter as JSON if provided
+		filterJSON := c.Query("filter")
+		if filterJSON != "" {
+			var filter map[string]interface{}
+			if err := json.Unmarshal([]byte(filterJSON), &filter); err != nil {
+				c.JSON(http.StatusBadRequest, responses.ComponentResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				return
+			}
+			pagination.Filter = filter
 		}
 
 		if validationErr := validate.Struct(&pagination); validationErr != nil {
@@ -74,7 +97,25 @@ func (c ComponentController) FindPaginatedComponent() gin.HandlerFunc {
 			return
 		}
 
-		result, err := componentService.FindPaginatedComponent(pagination)
+		result, total, err := componentService.FindPaginatedComponent(pagination)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, responses.ComponentResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			return
+		}
+
+		c.JSON(http.StatusOK, responses.ComponentResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": result, "total": total}})
+	}
+}
+
+func (c ComponentController) CheckAlreadyExistingComponents() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var componentNames []string
+
+		if !utils.BindJSONAndValidate(c, &componentNames) {
+			return
+		}
+		result, err := componentService.CheckAlreadyExistingComponents(componentNames)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ComponentResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
