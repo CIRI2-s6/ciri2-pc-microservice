@@ -8,6 +8,8 @@ require (
 	go.mongodb.org/mongo-driver v1.14.0
 )
 
+require github.com/gin-contrib/gzip v1.0.0 // indirect
+
 require (
 	github.com/gin-contrib/cors v1.7.1
 	github.com/kr/text v0.2.0 // indirect

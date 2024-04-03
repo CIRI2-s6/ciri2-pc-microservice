@@ -63,6 +63,10 @@ func (c ComponentRepository) FindPaginated(pagination models.Pagination) ([]mode
 		return nil, 0, err
 	}
 
+	if totalCount == 0 {
+		return components, 0, nil
+	}
+
 	if pagination.Skip > int(totalCount) {
 		pagination.Skip = int(totalCount)
 	}
