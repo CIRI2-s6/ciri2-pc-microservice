@@ -9,11 +9,9 @@ WORKDIR /app
 COPY ./api/go.mod ./api/go.sum ./
 RUN go mod download
 
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/reference/dockerfile/#copy
 COPY ./api .
 
-# Build
+# Build go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o ciri2-pc-microservice ./cmd
 
 # Use a minimal base image for the final image
