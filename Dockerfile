@@ -4,6 +4,7 @@ FROM golang:1.22.1 AS builder
 # Set destination for COPY
 WORKDIR /app
 
+ENV MONGOURI = ${MONGOURI}
 
 # Download Go modules
 COPY ./api/go.mod ./api/go.sum ./
@@ -18,7 +19,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ciri2-pc-microservice ./cmd
 FROM scratch
 # Copy the built binary from the builder stage
 COPY --from=builder /app/ciri2-pc-microservice /ciri2-pc-microservice
-COPY ./api/.env .
 
 # Expose the port
 EXPOSE 6000
