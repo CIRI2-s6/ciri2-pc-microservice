@@ -1,14 +1,13 @@
+// Package utils holds utility functions that can be used across the application
 package utils
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
-var validate = validator.New()
-
+// BindJSONAndValidate binds the JSON request body to the input interface and validates it
 func BindJSONAndValidate(c *gin.Context, input interface{}) bool {
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

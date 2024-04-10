@@ -1,3 +1,4 @@
+// Package routes holds the routes for the application
 package routes
 
 import (
@@ -11,6 +12,5 @@ func ComponentRoutes(componentGroup *gin.Engine) {
 	componentGroup.POST("/component", component.BatchCreateComponent())
 	componentGroup.POST("/component/check", component.CheckAlreadyExistingComponents())
 	componentGroup.GET("/component/:id", component.GetComponent())
-	componentGroup.GET("/component", component.FindPaginatedComponent())
-
+	componentGroup.GET("/component", component.GetPaginatedComponent())
 }

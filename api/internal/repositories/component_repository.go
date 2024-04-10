@@ -1,3 +1,4 @@
+// Package repositories holds the database operations for the application
 package repositories
 
 import (
@@ -16,7 +17,8 @@ type ComponentRepository struct{}
 
 var componentCollection *mongo.Collection = configs.GetCollection(configs.DB, "components")
 
-func init() {
+// Init initializes the component collection
+func (c ComponentRepository) init() {
 
 	indexModel := mongo.IndexModel{
 		Keys:    bson.M{"name": 1},
@@ -28,6 +30,7 @@ func init() {
 	}
 }
 
+// BatchInsert inserts multiple components into the database
 func (c ComponentRepository) BatchInsert(components []interface{}) (*mongo.BulkWriteResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -44,6 +47,7 @@ func (c ComponentRepository) BatchInsert(components []interface{}) (*mongo.BulkW
 	return result, err
 }
 
+// FindOne finds a component by id
 func (c ComponentRepository) FindOne(id string) (interface{}, error) {
 	var component models.Component
 	objectId, _ := primitive.ObjectIDFromHex(id)
@@ -53,6 +57,7 @@ func (c ComponentRepository) FindOne(id string) (interface{}, error) {
 	return component, err
 }
 
+// FindPaginated finds components paginated
 func (c ComponentRepository) FindPaginated(pagination models.Pagination) ([]models.Component, int, error) {
 	var components []models.Component
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -87,6 +92,7 @@ func (c ComponentRepository) FindPaginated(pagination models.Pagination) ([]mode
 	return components, int(totalCount), nil
 }
 
+// CheckAlreadyExistingComponents checks if the components already exist in the database
 func (c ComponentRepository) CheckAlreadyExistingComponents(componentNames []string) ([]string, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

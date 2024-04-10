@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// ConnectDB connects to the MongoDB database
 func ConnectDB() *mongo.Client {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel() // Call the cancel function to avoid a context leak

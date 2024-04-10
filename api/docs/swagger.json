@@ -1,0 +1,212 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "PC Microservice documentation",
+        "contact": {},
+        "version": "0.0.5"
+    },
+    "paths": {
+        "/component": {
+            "get": {
+                "description": "Endpoint will get the components that match the pagination parameters",
+                "tags": [
+                    "Components"
+                ],
+                "summary": "Get components with pagination",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Skip",
+                        "name": "skip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter",
+                        "name": "filter",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ComponentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Batch create multiple components",
+                "tags": [
+                    "Components"
+                ],
+                "summary": "Batch create multiple components",
+                "parameters": [
+                    {
+                        "description": "Components",
+                        "name": "components",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ComponentInput"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ComponentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/component/check": {
+            "post": {
+                "description": "Check if components already exist",
+                "tags": [
+                    "Components"
+                ],
+                "summary": "Check if components already exist",
+                "parameters": [
+                    {
+                        "description": "Component Names",
+                        "name": "components",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ComponentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/component/{id}": {
+            "get": {
+                "description": "Get one component by id",
+                "tags": [
+                    "Components"
+                ],
+                "summary": "Get one component by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Component ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ComponentResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ComponentInput": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "type": {
+                    "$ref": "#/definitions/models.ComponentType"
+                }
+            }
+        },
+        "models.ComponentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ComponentType": {
+            "type": "string",
+            "enum": [
+                "CPU",
+                "GPU",
+                "RAM"
+            ],
+            "x-enum-varnames": [
+                "CPU",
+                "GPU",
+                "RAM"
+            ]
+        }
+    }
+}
